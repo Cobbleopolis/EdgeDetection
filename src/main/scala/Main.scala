@@ -18,6 +18,8 @@ object Main {
 
     var model: Model = _
 
+    var monkeyModel: Model = _
+
     var floorShader: Shader = _
 
     var floorModel: Model = _
@@ -126,13 +128,17 @@ object Main {
     def initGLData(): Unit = {
         basicShader = new Shader("basic")
 
-        model = new Model(Model.cubeVerts)
+        model = OBJLoader.loadObjModel("models/cube.obj")
+
+        monkeyModel = OBJLoader.loadObjModel("models/monkey.obj")
 
         floorShader = new Shader("basic", "floor")
 
-        floorModel = new Model(Model.floorVerts)
+        floorModel = OBJLoader.loadObjModel("models/floor.obj")
 
         model.modelMatrix.translate(0.0f, 1.0f, 0.0f)
+
+        monkeyModel.modelMatrix.translate(4.0f, 1.0f, 0.0f)
 
         screenShader = new Shader("screen")
 
@@ -177,6 +183,12 @@ object Main {
 
         model.draw()
 
+        Camera.uploadModel(monkeyModel.modelMatrix)
+
+        monkeyModel.draw()
+
+        Camera.uploadModel(floorModel.modelMatrix)
+
         floorShader.use()
 
         Camera.uploadAll(floorModel.modelMatrix)
@@ -208,6 +220,9 @@ object Main {
 
         if (model != null)
             model.destroy()
+
+        if (monkeyModel != null)
+            monkeyModel.destroy()
 
         if (floorShader != null)
             floorShader.destroy()

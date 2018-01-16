@@ -4,7 +4,7 @@
 #define lineThresh 0.95
 
 in vec4 worldPos;
-in vec4 viewPos;
+in vec3 fragNormal;
 
 out vec4 color;
 

@@ -7,12 +7,10 @@ object ShaderUtils {
 
     var currentShader: Int = 0
 
-    def readFromFile(name: String): String = Source.fromInputStream(getClass.getResourceAsStream(name)).mkString
-
     def generateProgramId: Int = glCreateProgram()
 
     private def attachShader(programId: Int, shaderPath: String, shaderConstant: Int): Int = {
-        val shaderSource: String = readFromFile(shaderPath)
+        val shaderSource: String = FileUtils.readFromFile(shaderPath)
 
         val shaderId: Int = glCreateShader(shaderConstant)
 

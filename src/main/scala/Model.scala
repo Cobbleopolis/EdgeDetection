@@ -23,17 +23,20 @@ class Model(verts: Array[Float]) {
     glBufferData(GL_ARRAY_BUFFER, floatBuffer, GL_STATIC_DRAW)
     glEnableVertexAttribArray(0)
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * 4, 0)
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * 4, 3 * 4)
 
     glDisableVertexAttribArray(0)
 
     def draw(): Unit = {
         glBindVertexArray(vaoId)
         glEnableVertexAttribArray(0)
+        glEnableVertexAttribArray(1)
 
         glDrawArrays(GL_TRIANGLES, 0, verts.length / 3)
 
         glDisableVertexAttribArray(0)
+        glDisableVertexAttribArray(1)
         glBindVertexArray(0)
     }
 
@@ -97,20 +100,11 @@ object Model {
     )
 
     val screenVerts: Array[Float] = Array[Float](
-        -1.0f, -1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-         1.0f,  1.0f, 0.0f
-    )
-    
-    val screenVerts2: Array[Float] = Array[Float](
-        -0.5f, -1.0f, 0.0f,
-        0.5f, -1.0f, 0.0f,
-        -0.5f,  1.0f, 0.0f,
-        -0.5f,  1.0f, 0.0f,
-        0.5f, -1.0f, 0.0f,
-        0.5f,  1.0f, 0.0f
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+         1.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+        -1.0f,  1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+        -1.0f,  1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+         1.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+         1.0f,  1.0f, 0.0f, 0.0f, 0.0f, -1.0f
     )
 }
