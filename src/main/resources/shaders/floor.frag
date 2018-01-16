@@ -15,7 +15,8 @@ void main() {
     float xCos = cos(2 * M_PI * worldPos.x);
     float zCos = cos(2 * M_PI * worldPos.z);
     if (xCos >= lineThresh || zCos >= lineThresh)
-        color = vec4(lineColor, 1.0);
+        gl_FragData[0] = vec4(lineColor, 1.0);
     else
-        color = vec4(baseColor, 1.0);
+        gl_FragData[0] = vec4(baseColor, 1.0);
+    gl_FragData[1] = vec4(fragNormal, 1.0);
 }

@@ -32,7 +32,6 @@ object OBJLoader {
                 modelData += normalData.z
             })
         )
-        modelData.grouped(6).foreach(println)
         new Model(modelData.toArray)
     }
 

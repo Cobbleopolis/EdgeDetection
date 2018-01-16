@@ -11,10 +11,13 @@ object Screen {
 
     var fboTexture: Int = _
 
+    var fboNormal: Int = _
+
     var isInitalised: Boolean = false
 
     def init(): Unit = {
         fboTexture = glGenTextures()
+        fboNormal = glGenTextures()
         rboDepth = glGenRenderbuffers()
         baseFrameBuffer = glGenFramebuffers()
 
@@ -29,9 +32,19 @@ object Screen {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Main.WIDTH, Main.HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTexture, 0)
 
+        glBindTexture(GL_TEXTURE_2D, fboNormal)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Main.WIDTH, Main.HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, fboNormal, 0)
+
         glBindRenderbuffer(GL_RENDERBUFFER, rboDepth)
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Main.WIDTH, Main.HEIGHT)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth)
+
+        glDrawBuffers(Array[Int](GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1))
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
@@ -87,11 +100,14 @@ object Screen {
 
         glDeleteFramebuffers(baseFrameBuffer)
         glDeleteTextures(fboTexture)
+        glDeleteTextures(fboNormal)
         glDeleteRenderbuffers(rboDepth)
     }
 
     def onResizeHandler(windowId: Long, width: Int, height: Int): Unit = {
         glBindTexture(GL_TEXTURE_2D, fboTexture)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0)
+        glBindTexture(GL_TEXTURE_2D, fboNormal)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0)
         glBindTexture(GL_TEXTURE_2D, 0)
 

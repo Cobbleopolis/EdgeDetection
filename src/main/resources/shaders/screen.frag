@@ -6,6 +6,7 @@ in vec2 uv;
 out vec4 color;
 
 uniform sampler2D fbo_texture;
+uniform sampler2D fbo_normal;
 uniform bool disable_color;
 uniform vec2 resolution;
 
@@ -26,14 +27,22 @@ void make_detection_matrix(inout vec4 n[9], sampler2D tex, vec2 coord) {
 	n[8] = texture2D(tex, coord + vec2(  w, h));
 }
 
-void main() {
-    vec4 n[9];
-	make_detection_matrix(n, fbo_texture, uv);
-
-	vec4 sobel_edge_h = n[2] + (2.0 * n[5]) + n[8] - (n[0] + (2.0 * n[3]) + n[6]);
+float get_avg_sobel(vec4 n[9]) {
+    vec4 sobel_edge_h = n[2] + (2.0 * n[5]) + n[8] - (n[0] + (2.0 * n[3]) + n[6]);
   	vec4 sobel_edge_v = n[0] + (2.0 * n[1]) + n[2] - (n[6] + (2.0 * n[7]) + n[8]);
 	vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));
-    float avg_sobel = sobel.r + sobel.g + sobel.b / 3.0;
+    return sobel.r + sobel.g + sobel.b / 3.0;
+}
+
+void main() {
+    vec4 n[9];
+    vec4 h[9];
+	make_detection_matrix(n, fbo_normal, uv);
+	make_detection_matrix(h, fbo_texture, uv);
+
+    float avg_sobel_normal = get_avg_sobel(n);
+    float avg_sobel_texture = get_avg_sobel(h);
+    float avg_sobel = min(avg_sobel_texture + avg_sobel_normal, 1.0);
 
     if (disable_color) {
         color = vec4(vec3(avg_sobel), 1.0);

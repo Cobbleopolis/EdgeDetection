@@ -6,8 +6,6 @@ in vec3 fragNormal;
 out vec4 color;
 
 void main() {
-    color = vec4(
-        abs(fragNormal),
-        0.0f
-    );
+    gl_FragData[0] = vec4(0.8, 0.8, 0.8, 1.0f);
+    gl_FragData[1] = vec4(fragNormal, 1.0);
 }

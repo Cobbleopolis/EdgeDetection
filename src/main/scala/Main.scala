@@ -1,12 +1,11 @@
 import java.nio.IntBuffer
 
-import org.joml.{Quaternionf, Vector3f}
 import org.lwjgl.glfw.GLFW._
-import org.lwjgl.glfw.{GLFWErrorCallback, GLFWMouseButtonCallback, GLFWVidMode}
-import org.lwjgl.opengl.{GL, GLCapabilities}
+import org.lwjgl.glfw.{GLFWErrorCallback, GLFWVidMode}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL13._
 import org.lwjgl.opengl.GL20._
+import org.lwjgl.opengl.{GL, GLCapabilities}
 import org.lwjgl.system.{MemoryStack, MemoryUtil}
 
 
@@ -16,7 +15,9 @@ object Main {
 
     var basicShader: Shader = _
 
-    var model: Model = _
+    var cubeShader: Shader = _
+
+    var cubeModel: Model = _
 
     var monkeyModel: Model = _
 
@@ -88,7 +89,6 @@ object Main {
         glfwSetCursorEnterCallback(windowId, InputHandler.handleCursorEnter)
 
 
-
         glfwSetWindowPos(
             windowId,
             (vidmode.width() - pWidth.get(0)) / 2,
@@ -128,7 +128,9 @@ object Main {
     def initGLData(): Unit = {
         basicShader = new Shader("basic")
 
-        model = OBJLoader.loadObjModel("models/cube.obj")
+        cubeShader = new Shader("basic", "cube")
+
+        cubeModel = OBJLoader.loadObjModel("models/cube.obj")
 
         monkeyModel = OBJLoader.loadObjModel("models/monkey.obj")
 
@@ -136,7 +138,7 @@ object Main {
 
         floorModel = OBJLoader.loadObjModel("models/floor.obj")
 
-        model.modelMatrix.translate(0.0f, 1.0f, 0.0f)
+        cubeModel.modelMatrix.translate(0.0f, 1.0f, 0.0f)
 
         monkeyModel.modelMatrix.translate(4.0f, 1.0f, 0.0f)
 
@@ -172,22 +174,22 @@ object Main {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        basicShader.use()
+        cubeShader.use()
 
-        model.modelMatrix
+        cubeModel.modelMatrix
             //            .rotateLocalX(modelRotValue)
             .rotateY(modelRotValue)
             .rotateZ(modelRotValue)
 
-        Camera.uploadAll(model.modelMatrix)
+        Camera.uploadAll(cubeModel.modelMatrix)
 
-        model.draw()
+        cubeModel.draw()
 
-        Camera.uploadModel(monkeyModel.modelMatrix)
+        basicShader.use()
+
+        Camera.uploadAll(monkeyModel.modelMatrix)
 
         monkeyModel.draw()
-
-        Camera.uploadModel(floorModel.modelMatrix)
 
         floorShader.use()
 
@@ -207,7 +209,10 @@ object Main {
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, Screen.fboTexture)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, Screen.fboNormal)
         glUniform1i(screenShader.getUniformLocation("fbo_texture"), 0)
+        glUniform1i(screenShader.getUniformLocation("fbo_normal"), 1)
 
         glUniform1i(screenShader.getUniformLocation("disable_color"), disableColor)
 
@@ -218,8 +223,11 @@ object Main {
         if (basicShader != null)
             basicShader.destroy()
 
-        if (model != null)
-            model.destroy()
+        if (cubeShader != null)
+            cubeShader.destroy()
+
+        if (cubeModel != null)
+            cubeModel.destroy()
 
         if (monkeyModel != null)
             monkeyModel.destroy()
@@ -230,10 +238,10 @@ object Main {
         if (floorModel != null)
             floorModel.destroy()
 
-        if(screenShader != null)
+        if (screenShader != null)
             screenShader.destroy()
 
-        if(Screen.isInitalised)
+        if (Screen.isInitalised)
             Screen.destroy()
 
         glfwSetInputMode(windowId, GLFW_CURSOR, GLFW_CURSOR_NORMAL)
